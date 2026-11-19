@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e8cbd2">
+<title>US.EXE, Eight Months of Us</title>
+<style>
+:root{
+ --desk:#e8cbd2;--desk2:#f4e8e6;--cream:#eee9dc;--cream2:#d8d2c4;
+ --ink:#443943;--rose:#a85e79;--rose2:#d69aaf;--blue:#7888a7;
+ --shadow:#75616b;--white:#fffaf5;--line:#b6aeb0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Tahoma,"MS Sans Serif",Arial,sans-serif;color:var(--ink);background:var(--desk);font-size:13px;user-select:none}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+#desktop{
+ position:relative;width:100vw;height:100dvh;overflow:hidden;
+ background:
+ radial-gradient(ellipse at 20% 18%,#f8e8e7 0,transparent 40%),
+ radial-gradient(ellipse at 85% 75%,#d7a9ba 0,transparent 42%),
+ linear-gradient(135deg,#e8cbd2,#eadbd2 55%,#d8b6c2);
+}
+.wallpaper-mark{position:absolute;right:4vw;bottom:75px;font-family:Georgia,serif;font-size:clamp(35px,7vw,90px);color:#fff8;letter-spacing:-4px;pointer-events:none}
+.desktop-icons{position:absolute;inset:12px auto 55px 12px;display:grid;grid-auto-flow:row;grid-template-columns:82px;grid-auto-rows:92px;gap:3px;align-content:start;z-index:2}
+.desktop-icon{width:78px;min-height:82px;border:1px solid transparent;background:transparent;color:#51404b;text-shadow:1px 1px #fff8;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;padding:4px 2px}
+.desktop-icon:hover,.desktop-icon:focus{background:#fff4;border:1px dotted #fff;outline:0}
+.desktop-icon .glyph{font-size:31px;line-height:38px;filter:drop-shadow(1px 2px 0 #fff8)}
+.desktop-icon .iname{font-size:11px;text-align:center;line-height:1.2;max-width:76px}
+.taskbar{position:absolute;bottom:0;left:0;right:0;height:43px;background:var(--cream);border-top:2px solid white;box-shadow:0 -2px 0 #b8afb0;display:flex;align-items:center;gap:6px;padding:4px;z-index:1000}
+.winbtn,.taskitem,.clock{height:31px;background:var(--cream);border:2px outset #fff;border-right-color:#8e8889;border-bottom-color:#8e8889;padding:4px 9px;font-weight:bold}
+.winbtn:active,.taskitem.active{border-style:inset}
+.winbtn{display:flex;align-items:center;gap:6px}
+.start-logo{font-size:17px}
+.taskitems{display:flex;gap:4px;flex:1;min-width:0;overflow:auto}
+.taskitem{font-size:11px;max-width:155px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.clock{font-size:11px;font-weight:normal;min-width:75px;text-align:center}
+.window{position:absolute;width:min(490px,calc(100vw - 26px));max-height:calc(100dvh - 80px);background:var(--cream);border:2px solid;border-color:#fff #777 #777 #fff;box-shadow:3px 4px 0 #735c6870;z-index:10;display:flex;flex-direction:column}
+.window.hidden{display:none}
+.titlebar{height:27px;flex:none;background:linear-gradient(90deg,#9d647c,#d5a2b4);color:white;display:flex;align-items:center;justify-content:space-between;padding:2px 3px 2px 7px;font-weight:bold;font-size:12px;cursor:move}
+.titlebar .controls{display:flex;gap:3px}
+.titlebar button{height:19px;min-width:21px;padding:0 4px;background:var(--cream);border:1px outset white;color:#332b30;font-weight:bold;line-height:15px}
+.winbody{padding:13px;overflow:auto;max-height:calc(100dvh - 125px)}
+.toolbar{display:flex;gap:5px;flex-wrap:wrap;padding:7px;border-bottom:1px solid #b8b0ae;background:#e9e4d9}
+.retro-btn{background:var(--cream);border:2px outset white;padding:6px 10px;font-size:12px}
+.retro-btn:active{border-style:inset}
+.panel{background:#fffaf4;border:1px solid #b9aeb1;box-shadow:inset 1px 1px #fff;padding:12px;margin:7px 0}
+h1,h2,h3,p{margin-top:0}
+h2{font-family:Georgia,serif;font-weight:normal;color:#97546e;font-size:25px;margin-bottom:9px}
+h3{font-size:13px;margin-bottom:7px}
+.muted{color:#8a737d;line-height:1.55}
+.filelist{width:100%;border-collapse:collapse;background:#fffaf4}
+.filelist th{text-align:left;background:#e9e2df;font-weight:normal;border-bottom:1px solid #c6b9ba;padding:6px}
+.filelist td{padding:7px 6px;border-bottom:1px solid #eee5e3}
+.filelist tr{cursor:pointer}.filelist tbody tr:hover{background:#f7e5eb}
+.tag{font-size:10px;color:#906176}
+.reason-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.reason{min-height:105px;background:#f8e9ed;border:1px solid #d9b7c3;padding:11px;text-align:left;transition:transform .2s ease,background .2s ease}
+.reason:hover:not(:disabled){background:#f4dce3;transform:translateY(-1px)}
+.reason.revealed{background:#fffaf5;border-color:#c68da2;animation:cardPop .28s ease}
+@keyframes cardPop{0%{transform:scale(.95)}65%{transform:scale(1.03)}100%{transform:scale(1)}}
+.reason b{display:block;color:#9d5873;font-size:21px;margin-bottom:8px}
+.reason span{font-family:Georgia,serif;line-height:1.4}
+.photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.photo-card{background:white;border:1px solid #c8bdba;padding:7px;box-shadow:1px 2px 2px #7772}
+.photo-card img{width:100%;height:auto;object-fit:contain;background:#eee1e2;display:block}
+.photo-card small{display:block;padding:7px 2px 2px;color:#745866;line-height:1.4}
+.note{font-family:Georgia,serif;line-height:1.8;white-space:pre-wrap;background:#fffdf7;padding:17px;border:1px solid #c9bcb1}
+.paint-wrap{background:#d9d4c9;padding:8px}
+#paintCanvas{display:block;width:100%;height:260px;background:white;border:2px inset #aaa;touch-action:none;cursor:crosshair}
+input[type=color]{width:35px;height:28px;padding:1px}
+input[type=range]{width:85px}
+#cosmos{display:none;position:absolute;inset:0;background:#050713;color:#f7edf5;z-index:900;overflow:auto}
+#cosmos.active{display:block;animation:cosmicIn 2.2s ease both}
+@keyframes cosmicIn{0%{opacity:0;filter:blur(12px)}100%{opacity:1;filter:blur(0)}}
+#starsCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.cosmos-content{position:relative;z-index:2;max-width:900px;margin:auto;padding:9vh 22px 65px;text-align:center}
+.cosmos-kicker{letter-spacing:4px;text-transform:uppercase;font-size:10px;color:#c9a9d7}
+.cosmos-title{font-family:Georgia,serif;font-weight:normal;font-size:clamp(37px,8vw,75px);line-height:1.05;color:#fff;margin:18px 0}
+.cosmos-intro{max-width:570px;margin:0 auto 35px;color:#d3c6dc;line-height:1.8;font-family:Georgia,serif}
+.constellation{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;max-width:600px;margin:28px auto}
+.star-card{background:#ffffff0b;border:1px solid #bca5d544;border-radius:12px;padding:15px 7px;color:#eee;min-height:95px}
+.star-card .star{font-size:28px;color:#f7dca3;display:block;text-shadow:0 0 16px #f4c9ff}
+.star-card small{display:block;color:#c6b7d1;margin-top:6px}
+.cosmic-letter{display:none;max-width:650px;margin:35px auto 0;text-align:left;padding:25px;background:#ffffff0b;border:1px solid #cbb6d355;border-radius:10px;line-height:1.9;color:#f1e9f4;font-family:Georgia,serif;white-space:pre-wrap}
+.cosmic-letter.show{display:block;animation:cosmicIn 1.4s ease}
+#toast{position:absolute;left:50%;bottom:60px;transform:translateX(-50%);background:#fffaf0;border:2px outset white;padding:10px 15px;z-index:1100;box-shadow:2px 3px #7766;display:none;max-width:90vw;text-align:center}
+#startmenu{display:none;position:absolute;bottom:43px;left:4px;width:225px;background:var(--cream);border:2px outset white;z-index:1101;padding:8px;box-shadow:3px 3px #6655}
+#startmenu button{display:block;width:100%;text-align:left;padding:9px;border:0;background:transparent}
+#startmenu button:hover{background:#ead1da}
+#boot{position:absolute;inset:0;z-index:2000;background:#e9d9d8;display:flex;align-items:center;justify-content:center;padding:20px}
+.bootbox{width:min(430px,100%);background:var(--cream);border:3px outset white;padding:22px;box-shadow:7px 8px #806c7655}
+.bootlogo{font-family:Georgia,serif;font-size:35px;color:#9c5874;text-align:center;margin:8px 0 20px}
+.progress{height:16px;border:2px inset #aaa;background:#fff;padding:2px;margin:15px 0}
+.progress span{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,#ad6c87 0 12px,#d59aaf 12px 15px);transition:width 1.2s}
+#boot .retro-btn{display:block;margin:18px auto 0;min-width:145px}
+.assistant{position:absolute;right:18px;bottom:57px;z-index:30;background:#fffaf4;border:2px outset white;padding:10px;width:190px;box-shadow:3px 3px #7655;display:none}
+.assistant:after{content:"";position:absolute;bottom:-8px;right:24px;width:12px;height:12px;background:#fffaf4;border-right:1px solid #aaa;border-bottom:1px solid #aaa;transform:rotate(45deg)}
+@media(max-width:600px){
+ .desktop-icons{grid-template-columns:repeat(3,76px);grid-auto-rows:85px;inset:8px 5px auto 5px}
+ .wallpaper-mark{font-size:45px;bottom:60px;right:10px}
+ .window{left:8px!important;top:100px!important;width:calc(100vw - 16px);max-height:calc(100dvh - 155px)}
+ .winbody{max-height:calc(100dvh - 200px)}
+ .constellation{grid-template-columns:repeat(2,1fr)}
+ .taskitem{max-width:85px}
+ .clock{min-width:53px;padding:5px 3px}
+ .assistant{right:8px;bottom:55px}
+}
+</style>
+</head>
+<body>
+<div id="desktop">
+ <div class="wallpaper-mark">our little space</div>
+ <div class="desktop-icons" id="desktopIcons"></div>
+ <div id="windows"></div>
+ <div class="assistant" id="assistant">Heluu bubuu! This is our eight months and makeup website🫂🫂 <button class="retro-btn" onclick="this.parentElement.style.display='none'">Okay!</button></div>
+ <div id="startmenu">
+  <div style="font-family:Georgia,serif;font-size:19px;color:#985c75;padding:7px">our little computer ♡</div>
+  <hr>
+  <button onclick="openApp('chaos')">Open Exhibit.exe</button>
+  <button onclick="openApp('reasons')"> Open HER.exe</button>
+  <button onclick="openApp('memories')">Open MEMORIES</button>
+  <button onclick="openApp('paint')">Open Paint</button>
+  <button onclick="openApp('space')">Open SPACE.exe</button>
+  <hr><button onclick="document.getElementById('startmenu').style.display='none'">Shut down…</button>
+ </div>
+ <div id="toast"></div>
+ <div class="taskbar">
+  <button class="winbtn" id="startBtn"><span class="start-logo">⊞</span> Start</button>
+  <div class="taskitems" id="taskitems"></div>
+  <div class="clock" id="clock">♡ 8 months</div>
+ </div>
+ <div id="boot">
+  <div class="bootbox">
+   <div style="font-size:11px;letter-spacing:3px;text-align:center;color:#9b7181">OUR RELATIONSHIP ARCHIVE</div>
+   <div class="bootlogo">M loves S.EXE</div>
+   <div id="bootlines" style="font-size:12px;line-height:1.9">
+    Initialising relationship database...<br>
+    Checking for mommy's cutu texts...<br>
+    Loading eight months of memories...
+   </div>
+   <div class="progress"><span id="progressFill"></span></div>
+   <div style="font-size:11px;color:#917b83;text-align:center">A tiny computer made for my sweetu baby😘😘😘</div>
+   <button class="retro-btn" id="startComputer">POWER ON</button>
+  </div>
+ </div>
+</div>
+
+<div id="cosmos">
+ <canvas id="starsCanvas"></canvas>
+ <div class="cosmos-content">
+  <div class="cosmos-kicker">Archive recovered · Personal log 008</div>
+  <h1 class="cosmos-title">Eight months.<br>One universe.</h1>
+  <p class="cosmos-intro">Somewhere in all the ordinary days, conversations, laughter and little moments, something became important. These are eight small pieces of our universe. Click each star.</p>
+  <div class="constellation" id="constellation"></div>
+  <button class="retro-btn" id="revealLetter" style="background:#e9d6e8;color:#31243a;border:2px outset #fff">OPEN THE FINAL MESSAGE</button>
+  <div class="cosmic-letter" id="cosmicLetter"></div>
+  <div style="margin-top:35px;color:#9b8aaa;font-size:11px;letter-spacing:2px">END OF TRANSMISSION · HAPPY EIGHT MONTHS ♡</div>
+ </div>
+</div>
+<script>
+/* ==========================================================
+   PERSONALISE THIS FILE:
+   Edit the text in the CONFIG object below.
+   Put your images in assets/screenshots and assets/photos.
+   Use paths like "assets/screenshots/chat-01.png".
+   ========================================================== */
+const CONFIG = {
+  girlfriendName: "I loveeee youuu",
+  openingMessage: "A little archive of us.",
+  reasons: [
+    "The way you make ordinary moments feel like something worth remembering.",
+    "Your little habits that you probably don't even realise I notice.",
+    "The way I can be completely myself around you.",
+    "How you make me smile at my phone all the timeeee.",
+    "Because you're you, and I loveeee absolutely everything about you even the things you think i don't"
+  ],
+  memories: [
+    {month:"Month 01",title:"Where it began",date:"April",story:"Gogglesss",image:"assets/photos/ssone.jpeg"},
+    {month:"Month 02",title:"A little moment",date:"May",story:"kuchuu puchuu cheeks",image:"assets/photos/sstwo.jpeg"},
+    {month:"Month 03",title:"Something worth keeping",date:"June",story:"maggi masala",image:"assets/photos/ssthree.jpeg"},
+    {month:"Month 04",title:"A favourite day",date:"July",story:"sleepy sleepy double trouble.",image:"assets/photos/ssfour.jpeg"},
+    {month:"Month 05",title:"A little closer",date:"August",story:"extremely kuchuu puchuu",image:"assets/photos/ssfive.jpeg"},
+    {month:"Month 06",title:"One for the archive",date:"september",story:"focusing",image:"assets/photos/sssix.jpeg"},
+    {month:"Month 07",title:"Recently, us",date:"October",story:"awwwww so pretyyyy",image:"assets/photos/ssseven.jpeg"},
+    {month:"Month 08",title:"Here we are",date:"November",story:"big dawg got biceps",image:"assets/photos/sseight.jpeg"}
+  ],
+  screenshots: [
+    {file:"assets/screenshots/picone.png",title:"that_one_convo.png",caption:"Add your own commentary here."},
+    {file:"assets/screenshots/twinpic.png",title:"why_are_we_like_this.png",caption:"we freaky twins hehehe"},
+    {file:"assets/screenshots/secret.png",title:"top_secret.png",caption:"top secret shhh"}
+  ],
+  insideJokes: [
+    {name:"The thing we always say",detail:"i meowwww youuuu and twinn😋"},
+    {name:"That one incident",detail:"when we were sneak calling at your home🙃"},
+    {name:"Our humour",detail:"I'm the funnier one😋😋"}
+  ],
+  playlist: [
+    {title:"Song that reminds me of you",url:"https://www.youtube.com/shorts/-Lg5Z4T6VGo"},
+    {title:"Our favorite song",url:"https://www.youtube.com/watch?v=AC6jRT2-EJ0"}
+  ],
+  notes: [
+    "Things I notice about you: The way you smile soo cutely, how softly you talk to me, you pretty pretty cheeks and hottie thighs🥵",
+    "Things I wish I told you more often: That how much you mean to me and i'll always be with you🫂🫂",
+    "Things that remind me of you: Mujhe to aapki yaad har time aati hai ji"
+  ],
+  letter: `My love,\n\nI wanted to make you something that feels like us, with all the silly little things and the moments I want to keep.\n\nThank you for being part of my days, for the conversations, the laughter, the comfort and all the little things that have become ours.\n\nI know a website can't really explain what you mean to me. But I hope that as you explore through, you can see how much I value them and YOU.\n\nI love getting to know you more. I love having someone to share the randomest thoughts with. I love that we've made memories out of ordinary days. And I hope we keep making many more.\n\nThank you for these eight months. I'm really glad it's you.\n\nAlways and forever`,
+  finalMessage: "If I could keep one thing from all these months, it would be the feeling of getting to know you. I hope we keep finding new things to laugh about and new little memories to cherish for rest of our lives. Thank you for being in my life. Happy eight months babyyyyy😘😘💋",
+  cosmicStars: [
+    {label:"Month 01",title:"The beginning",text:"Add one specific memory from your first month."},
+    {label:"Month 02",title:"A small detail",text:"Add a memory, photo or conversation."},
+    {label:"Month 03",title:"A moment",text:"Add something you still remember."},
+    {label:"Month 04",title:"A favourite",text:"Add a moment that makes you smile."},
+    {label:"Month 05",title:"Something ours",text:"Add a memory only the two of you understand."},
+    {label:"Month 06",title:"Still here",text:"Add something that brought you closer."},
+    {label:"Month 07",title:"Recently",text:"Add a recent favourite moment."},
+    {label:"Month 08",title:"Right now",text:"Add what these eight months mean to you."}
+  ]
+};
+
+const $=s=>document.querySelector(s);
+const apps={
+ chaos:{name:"Exhibit.exe",icon:"💬",width:530,render:renderChaos},
+ reasons:{name:"HER.exe",icon:"💗",width:500,render:renderReasons},
+ memories:{name:"MEMORIES",icon:"📸",width:550,render:renderMemories},
+ notes:{name:"IMPORTANT.txt",icon:"📝",width:480,render:renderNotes},
+ letter:{name:"LETTER.txt",icon:"💌",width:500,render:renderLetter},
+ media:{name:"MEDIA PLAYER",icon:"🎵",width:420,render:renderMedia},
+ recycle:{name:"Recycle Bin",icon:"🗑️",width:420,render:renderRecycle},
+ paint:{name:"Paint",icon:"🎨",width:520,render:renderPaint},
+ space:{name:"SPACE.exe",icon:"🌌",width:390,render:renderSpace}
+};
+const desktopIcons=[
+ ["💬","Exhibit.exe","chaos"],["💗","HER.exe","reasons"],["📸","MEMORIES","memories"],
+ ["📝","IMPORTANT.txt","notes"],["🎵","MEDIA PLAYER","media"],
+ ["🗑️","Recycle Bin","recycle"],["🎨","Paint","paint"]
+];
+let z=20,winCount=0,openWins={},paintReady=false;
+function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",2800);}
+function initDesktop(){
+ const host=$("#desktopIcons");
+ desktopIcons.forEach(([icon,label,id])=>{
+  const b=document.createElement("button");b.className="desktop-icon";b.innerHTML=`<span class="glyph">${icon}</span><span class="iname">${safe(label)}</span>`;
+  b.addEventListener("dblclick",()=>openApp(id));b.addEventListener("click",()=>{document.querySelectorAll(".desktop-icon").forEach(x=>x.style.background="");b.style.background="#fff5";});
+  b.addEventListener("touchend",e=>{if(b.dataset.tap==="1"){e.preventDefault();openApp(id);b.dataset.tap="";}else{b.dataset.tap="1";setTimeout(()=>b.dataset.tap="",650);}});
+  host.appendChild(b);
+ });
+ $("#startBtn").onclick=()=>{$("#startmenu").style.display=$("#startmenu").style.display==="block"?"none":"block";};
+ $("#startComputer").onclick=boot;
+ const anniversaryDate = new Date("2026-03-19T00:00:00"); // Change to your date
+
+function updateClock() {
+  const now = new Date();
+  let months = (now.getFullYear() - anniversaryDate.getFullYear()) * 12
+             + (now.getMonth() - anniversaryDate.getMonth());
+
+  let anniversary = new Date(anniversaryDate);
+  anniversary.setMonth(anniversary.getMonth() + months);
+
+  if (now < anniversary) months--;
+
+  anniversary = new Date(anniversaryDate);
+  anniversary.setMonth(anniversary.getMonth() + months);
+
+  const diff = now - anniversary;
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+
+  $("#clock").textContent =
+    `${months} months, ${days} days, ${hours}h ${minutes}m ${seconds}s`;
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+}
+function boot(){
+ const fill=$("#progressFill");fill.style.width="100%";
+ $("#startComputer").disabled=true;$("#startComputer").textContent="LOADING...";
+ setTimeout(()=>{$("#boot").style.display="none";toast("Welcome baby, "+CONFIG.girlfriendName+" 💋💋💋");setTimeout(()=>$("#assistant").style.display="block",5000);},1250);
+}
+function openApp(id){
+ $("#startmenu").style.display="none";
+ if(id==="space"){openSpaceWindow();return;}
+ if(openWins[id]){const w=document.getElementById(openWins[id]);w.classList.remove("hidden");w.style.zIndex=++z;return;}
+ const app=apps[id];if(!app)return;
+ const win=document.createElement("section");const wid="window-"+id+"-"+(++winCount);win.id=wid;win.className="window";win.style.width=`min(${app.width}px,calc(100vw - 26px))`;
+ const offset=(winCount*24)%110;win.style.left=`${Math.max(10,Math.min(window.innerWidth-app.width-15,100+offset))}px`;win.style.top=`${Math.max(12,65+offset/2)}px`;win.style.zIndex=++z;
+ win.innerHTML=`<div class="titlebar"><span>${app.icon} &nbsp;${safe(app.name)}</span><div class="controls"><button data-min>_</button><button data-max>□</button><button data-close>×</button></div></div><div class="winbody">${app.render()}</div>`;
+ $("#windows").appendChild(win);openWins[id]=wid;
+ win.querySelector("[data-close]").onclick=()=>closeWin(id);
+ win.querySelector("[data-min]").onclick=()=>{win.classList.add("hidden");updateTask(id,true);};
+ win.querySelector("[data-max]").onclick=()=>{win.classList.toggle("maximized");if(win.classList.contains("maximized")){win.dataset.old=JSON.stringify({left:win.style.left,top:win.style.top,width:win.style.width,height:win.style.height});win.style.left="3px";win.style.top="3px";win.style.width="calc(100vw - 6px)";win.style.height="calc(100dvh - 49px)";}else{let o=JSON.parse(win.dataset.old||"{}");Object.assign(win.style,o);}};
+ win.addEventListener("pointerdown",()=>win.style.zIndex=++z);
+ makeDraggable(win,win.querySelector(".titlebar"));
+ updateTask(id,false);
+ if(id==="paint")setupPaint(win);
+}
+function closeWin(id){const w=document.getElementById(openWins[id]);if(w)w.remove();delete openWins[id];const b=document.querySelector(`[data-task="${id}"]`);if(b)b.remove();}
+function updateTask(id,minimized){let b=document.querySelector(`[data-task="${id}"]`);if(!b){b=document.createElement("button");b.className="taskitem";b.dataset.task=id;b.textContent=apps[id].name;b.onclick=()=>{let w=document.getElementById(openWins[id]);if(!w)return;w.classList.remove("hidden");w.style.zIndex=++z;};$("#taskitems").appendChild(b);}b.classList.toggle("active",!minimized);}
+function makeDraggable(win,bar){
+ let sx=0,sy=0,ox=0,oy=0,drag=false;
+ bar.addEventListener("pointerdown",e=>{if(e.target.tagName==="BUTTON"||win.classList.contains("maximized"))return;drag=true;sx=e.clientX;sy=e.clientY;ox=win.offsetLeft;oy=win.offsetTop;bar.setPointerCapture(e.pointerId);win.style.zIndex=++z;});
+ bar.addEventListener("pointermove",e=>{if(!drag)return;win.style.left=Math.max(0,Math.min(innerWidth-win.offsetWidth,ox+e.clientX-sx))+"px";win.style.top=Math.max(0,Math.min(innerHeight-90,oy+e.clientY-sy))+"px";});
+ bar.addEventListener("pointerup",()=>drag=false);bar.addEventListener("pointercancel",()=>drag=false);
+}
+function renderChaos(){
+ let rows=CONFIG.screenshots.map((s,i)=>`<tr onclick="showScreenshot(${i})"><td>🖼️ ${safe(s.title)}</td><td>Image</td><td class="tag">Exhibit ${String(i+1).padStart(3,"0")}</td></tr>`).join("");
+ let jokes=CONFIG.insideJokes.map((j,i)=>`<div class="panel"><b>${safe(j.name)}</b><p class="muted" style="margin:7px 0 0">${safe(j.detail)}</p></div>`).join("");
+ return `<div class="toolbar"><button class="retro-btn" onclick="showChaosTab('files')">Files</button><button class="retro-btn" onclick="showChaosTab('jokes')">Inside jokes</button><span class="tag" style="align-self:center">3.2 MB · Highly classified</span></div><div id="chaos-files"><p class="muted">Some evidence should probably have stayed deleted.</p><table class="filelist"><thead><tr><th>Name</th><th>Type</th><th>Exhibit</th></tr></thead><tbody>${rows}</tbody></table><div id="shotPreview"></div></div><div id="chaos-jokes" style="display:none"><h2>Things only we understand</h2>${jokes}</div>`;
+}
+window.showChaosTab=tab=>{const w=document.querySelector("#chaos-files");if(!w)return;w.style.display=tab==="files"?"block":"none";$("#chaos-jokes").style.display=tab==="jokes"?"block":"none";};
+window.showScreenshot=i=>{
+ const s=CONFIG.screenshots[i],target=$("#shotPreview");if(!target)return;
+ target.innerHTML=`<div class="panel" style="margin-top:12px"><div style="font-weight:bold;margin-bottom:8px">${safe(s.title)}</div><img src="${safe(s.file)}" alt="Add your screenshot" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" style="width:100%;max-height:340px;object-fit:contain;background:#eee"><div style="display:none;background:#f6e9eb;padding:35px;text-align:center;color:#96687c">Screenshot placeholder<br><small>Add your image at ${safe(s.file)}</small></div><p class="muted" style="margin:10px 0 0">${safe(s.caption)}</p><button class="retro-btn" style="margin-top:10px" onclick="toast('Evidence successfully preserved. ♡')">Save to memory</button></div>`;
+};
+window.revealReason=(btn,i)=>{
+ if(btn.disabled)return;
+ btn.innerHTML=`<b>♡ ${i+1}</b><span>${safe(CONFIG.reasons[i])}</span>`;
+ btn.classList.add("revealed");
+ btn.disabled=true;
+};
+function renderReasons(){return `<p class="muted">Five things I love about you. Click each card to open it.</p><div class="reason-grid">${CONFIG.reasons.slice(0,5).map((r,i)=>`<button class="reason" onclick="revealReason(this,${i})"><b>♡ ${i+1}</b><span>Click to reveal</span></button>`).join("")}</div><div class="panel" style="margin-top:12px;text-align:center;font-family:Georgia,serif">Five reasons. An unreasonable number still left to discover.</div>`;}
+function renderMemories(){return `<p class="muted">Eight little chapters. Add your dates, photos and the details only you two remember.</p><div class="photo-grid">${CONFIG.memories.map((m,i)=>`<div class="photo-card">${m.image?`<img src="${safe(m.image)}" alt="${safe(m.title)}" onerror="this.style.display='none'">`:`<div style="aspect-ratio:4/3;background:linear-gradient(135deg,#f5e2e6,#e8d4d0);display:grid;place-items:center;font-size:34px">♡</div>`}<small><b>${safe(m.month)} · ${safe(m.date)}</b><br>${safe(m.title)}<br>${safe(m.story)}</small></div>`).join("")}</div>`;}
+function renderNotes(){return `<p class="muted">A few things saved in Notepad.</p>${CONFIG.notes.map((n,i)=>`<div class="note" style="margin-bottom:9px"><span style="color:#9a6b7e;font-size:11px">NOTE_${String(i+1).padStart(2,"0")}.txt</span><br>${safe(n)}</div>`).join("")}<button class="retro-btn" onclick="openApp('letter')">Open the longer letter →</button>`;}
+function renderLetter(){return `<div class="note">${safe(CONFIG.letter)}\n\n${safe(CONFIG.finalMessage)}</div>`;}
+function renderMedia(){return `<div style="display:flex;gap:12px;align-items:center"><div style="font-size:45px">🎵</div><div><b>Our soundtracks</b><div class="muted">Aaap to inta accha sing karti ho😋.</div></div></div><div class="panel">${CONFIG.playlist.map((p,i)=>`<div style="padding:8px;border-bottom:1px solid #eee"><b>${i+1}. ${safe(p.title)}</b><div class="muted">${safe(p.artist)}</div>${p.url?`<a href="${safe(p.url)}" target="_blank" rel="noopener">Open song ↗</a>`:"<span class='tag'>Add a song link in CONFIG</span>"}</div>`).join("")}</div><p class="muted"></p>`;}
+function renderRecycle(){return `<p class="muted">A few files that have been sent to the bin. Some may be restored.</p><div class="panel"><p>🗑️ <b>boyfriend_is_wrong.txt</b></p><p class="muted">Status: disputed</p><button class="retro-btn" onclick="toast('File restored. He was still probably wrong. 😌')">Restore</button></div><div class="panel"><p>🗑️ <b>that_embarrassing_moment.dat</b></p><p class="muted">Status: permanently remembered</p><button class="retro-btn" onclick="toast('Unfortunately, this memory cannot be deleted.')">Try to delete</button></div><div class="panel"><p>🗑️ <b>missing_you.exe</b></p><p class="muted">Status: keeps regenerating</p></div>`;}
+function renderPaint(){return `<p class="muted">Leave a tiny drawing or a message. You can save your drawing as an image.</p><div class="paint-wrap"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><label>Colour <input type="color" id="paintColor" value="#c66f91"></label><label>Brush <input type="range" id="paintSize" min="1" max="22" value="4"></label><button class="retro-btn" id="paintClear">Clear</button><button class="retro-btn" id="paintSave">Save drawing</button></div><canvas id="paintCanvas" width="900" height="450"></canvas></div>`;}
+function renderSpace(){return `<div style="text-align:center;padding:8px"><div style="font-size:50px">🌌</div><h2>SPACE.EXE</h2><p class="muted">A mysterious application. No guarantees about system stability.</p><div class="panel" style="text-align:left"><b>Are you sure you want to continue?</b><p class="muted" style="margin:8px 0 0">This operation may exceed available memory.</p></div><button class="retro-btn" onclick="startCrash()">YES</button> <button class="retro-btn" onclick="startCrash()">YES, OBVIOUSLY</button></div>`;}
+function setupPaint(win){
+ const c=win.querySelector("#paintCanvas");if(!c)return;const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);let drawing=false,last=null;
+ function pos(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};}
+ c.addEventListener("pointerdown",e=>{drawing=true;last=pos(e);c.setPointerCapture(e.pointerId);});
+ c.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);ctx.strokeStyle=win.querySelector("#paintColor").value;ctx.lineWidth=win.querySelector("#paintSize").value;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;});
+ c.addEventListener("pointerup",()=>drawing=false);c.addEventListener("pointercancel",()=>drawing=false);
+ win.querySelector("#paintClear").onclick=()=>{ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);};
+ win.querySelector("#paintSave").onclick=()=>{const a=document.createElement("a");a.download="a-little-drawing-for-us.png";a.href=c.toDataURL();a.click();};
+}
+function openSpaceWindow(){openApp("space");}
+function startCrash(){
+ document.querySelectorAll(".window").forEach(w=>w.remove());openWins={};$("#taskitems").innerHTML="";$("#startmenu").style.display="none";
+ const d=$("#desktop");const glitch=document.createElement("div");glitch.style.cssText="position:absolute;inset:0;z-index:850;background:#f1e7e6;display:grid;place-items:center;color:#493b45;font-family:monospace;text-align:center;line-height:2;padding:20px";
+ glitch.innerHTML="<div>ARCHIVE.exe has stopped responding...<br>Saving memories...<br><br><b>8 MONTHS SUCCESSFULLY ARCHIVED.</b></div>";d.appendChild(glitch);
+ setTimeout(()=>{glitch.style.background="#080a15";glitch.style.color="#fff";glitch.innerHTML="<div style='font-size:22px'>RECOVERING ARCHIVE<span style='animation:blink 1s infinite'>_</span></div>";},900);
+ setTimeout(()=>{glitch.remove();$("#cosmos").classList.add("active");drawStars();buildConstellation();},2100);
+}
+function buildConstellation(){
+ const host=$("#constellation");host.innerHTML="";
+ CONFIG.cosmicStars.forEach((s,i)=>{const b=document.createElement("button");b.className="star-card";b.innerHTML=`<span class="star">✦</span><b>${safe(s.label)}</b><small>Click to remember</small>`;b.onclick=()=>{toast(s.title+": "+s.text);b.style.background="#ffffff20";b.querySelector("small").textContent=s.title;};host.appendChild(b);});
+}
+function drawStars(){
+ const c=$("#starsCanvas"),ctx=c.getContext("2d");let w,h,stars=[];
+ function resize(){w=c.width=innerWidth*devicePixelRatio;h=c.height=innerHeight*devicePixelRatio;stars=Array.from({length:180},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.7+.3,a:Math.random()*.7+.2,p:Math.random()*6}));}
+ resize();window.addEventListener("resize",resize);
+ let frame=0;function tick(){if(!$("#cosmos").classList.contains("active"))return;ctx.clearRect(0,0,w,h);frame+=.015;for(const s of stars){const alpha=s.a*(.65+.35*Math.sin(frame+s.p));ctx.fillStyle=`rgba(238,220,255,${alpha})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r*devicePixelRatio,0,Math.PI*2);ctx.fill();}requestAnimationFrame(tick);}tick();
+}
+$("#revealLetter").onclick=()=>{const el=$("#cosmicLetter");el.textContent=CONFIG.finalMessage+"\n\n"+CONFIG.letter;el.classList.add("show");el.scrollIntoView({behavior:"smooth",block:"center"});};
+initDesktop();
+</script>
+</body>
+</html>
